@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>StudyStart JYU API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 { color: #2c3e50; }
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>StudyStart JYU REST API</h1>
+    <p>Welcome to the StudyStart JYU REST API. The API is running successfully.</p>
+    
+    <h2>Available Endpoints:</h2>
+    
+    <div class="endpoint">
+        <h3>Register User</h3>
+        <p><strong>POST</strong> <code>/api/users/register</code></p>
+        <p>Register a new user in the system.</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3>Get All Users</h3>
+        <p><strong>GET</strong> <code>/api/users</code></p>
+        <p>Retrieve all registered users.</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3>Get User by Username</h3>
+        <p><strong>GET</strong> <code>/api/users/{username}</code></p>
+        <p>Retrieve a specific user by username.</p>
+    </div>
+    
+    <h2>Test Registration</h2>
+    <p>Use Postman or curl to test the registration endpoint.</p>
+</body>
+</html>
