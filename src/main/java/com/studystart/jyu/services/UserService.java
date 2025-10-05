@@ -7,6 +7,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.studystart.jyu.security.Role;
+
 /**
  * Service class handling all user-related operations
  */
@@ -19,8 +21,8 @@ public class UserService {
     static {
         User admin = new User("admin", "admin@studystart.jyu.fi", "Admin", "User");
         admin.setPasswordHash(hashPassword("admin123"));
-        admin.addRole("ADMIN");
-        admin.addRole("USER");
+        admin.addRole(Role.ADMIN);
+        admin.addRole(Role.USER);
         userDatabase.put(admin.getUsername(), admin);
         emailToUsername.put(admin.getEmail(), admin.getUsername());
     }
@@ -33,8 +35,8 @@ public class UserService {
         
         String passwordHash = hashPassword(plainPassword);
         user.setPasswordHash(passwordHash);
-        user.addRole("USER");
-        
+        user.addRole(Role.USER);
+
         userDatabase.put(user.getUsername(), user);
         emailToUsername.put(user.getEmail(), user.getUsername());
         

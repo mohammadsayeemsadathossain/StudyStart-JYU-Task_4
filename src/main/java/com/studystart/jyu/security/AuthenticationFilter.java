@@ -3,130 +3,159 @@ package com.studystart.jyu.security;
 import com.studystart.jyu.models.User;
 import com.studystart.jyu.services.UserService;
 
+import javax.annotation.Priority;
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Authentication Filter - intercepts ALL incoming requests
- * Implements HTTP Basic Authentication
- * 
- * Filter execution flow:
- * 1. Request comes in
- * 2. Filter checks Authorization header
- * 3. If valid credentials -> set SecurityContext and allow request
- * 4. If invalid/missing -> return 401 Unauthorized
+ * Authentication + RBAC Filter:
+ *  - Intercepts all incoming requests
+ *  - Supports HTTP Basic Authentication
+ *  - Always sets SecurityContext (authenticated user or guest)
+ *  - Evaluates @PermitAll, @DenyAll, and @RolesAllowed annotations
  */
-@Provider  // This annotation tells Jersey to use this class as a filter
+@Provider
+@Priority(Priorities.AUTHENTICATION) // ensure filter runs in auth phase
 public class AuthenticationFilter implements ContainerRequestFilter {
-    
+
+    @Context
+    private ResourceInfo resourceInfo; // to read method/class annotations
+
     // Constants for authentication
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BASIC_PREFIX = "Basic ";
-    
+    private static final String BEARER_PREFIX = "Bearer "; // reserved for future JWT
+
     // UserService to validate credentials
-    private UserService userService = new UserService();
-    
-    /**
-     * This method is called for EVERY request before it reaches your resources
-     * 
-     * @param requestContext Contains all request information (headers, path, etc.)
-     */
+    private final UserService userService = new UserService();
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        
-        // Get the Authorization header from the request
+        // === 1) Try to authenticate user ===
+        User authenticatedUser = null;
+
         List<String> authHeaders = requestContext.getHeaders().get(AUTHORIZATION_HEADER);
-        
-        // Check if Authorization header exists
-        if (authHeaders == null || authHeaders.isEmpty()) {
-            // No authorization header - return 401 Unauthorized
-            abortWithUnauthorized(requestContext, "Missing authorization header");
-            return;
+        if (authHeaders != null && !authHeaders.isEmpty()) {
+            String authHeader = authHeaders.get(0);
+
+            if (authHeader.startsWith(BASIC_PREFIX)) {
+                String base64Credentials = authHeader.substring(BASIC_PREFIX.length()).trim();
+
+                try {
+                    String credentials = new String(Base64.getDecoder().decode(base64Credentials));
+                    String[] parts = credentials.split(":", 2);
+                    if (parts.length == 2) {
+                        String username = parts[0];
+                        String password = parts[1];
+                        if (userService.userCredentialExists(username, password)) {
+                            authenticatedUser = userService.getUserWithPassword(username);
+                            System.out.println("User authenticated (Basic): " + username);
+                        }
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Invalid Base64: ignore, user remains guest
+                }
+            } else if (authHeader.startsWith(BEARER_PREFIX)) {
+                // TODO: add JWT parsing here in the future
+            }
         }
-        
-        // Get the authorization value
-        String authHeader = authHeaders.get(0);
-        
-        // Check if it starts with "Basic "
-        if (!authHeader.startsWith(BASIC_PREFIX)) {
-            abortWithUnauthorized(requestContext, "Invalid authorization format");
-            return;
-        }
-        
-        // Extract the Base64 encoded credentials
-        // Remove "Basic " prefix to get just the encoded string
-        String base64Credentials = authHeader.substring(BASIC_PREFIX.length()).trim();
-        
-        // Decode Base64 to get "username:password"
-        String credentials;
-        try {
-            byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
-            credentials = new String(decodedBytes);
-        } catch (IllegalArgumentException e) {
-            abortWithUnauthorized(requestContext, "Invalid Base64 encoding");
-            return;
-        }
-        
-        // Split into username and password
-        String[] parts = credentials.split(":", 2);  // Split only at first ":"
-        if (parts.length != 2) {
-            abortWithUnauthorized(requestContext, "Invalid credentials format");
-            return;
-        }
-        
-        String username = parts[0];
-        String password = parts[1];
-        
-        // Validate credentials using UserService
-        if (!userService.userCredentialExists(username, password)) {
-            abortWithUnauthorized(requestContext, "Invalid username or password");
-            return;
-        }
-        
-        // Credentials are valid - get the full user object
-        User authenticatedUser = userService.getUserWithPassword(username);
-        
-        // Get the request scheme (http or https)
+
+        // === 2) Always set SecurityContext (guest if not authenticated) ===
         String scheme = requestContext.getUriInfo().getRequestUri().getScheme();
-        
-        // Create and set SecurityContext
-        // This tells Jersey WHO the authenticated user is
-        CustomSecurityContext securityContext = new CustomSecurityContext(authenticatedUser, scheme);
-        requestContext.setSecurityContext(securityContext);
-        
-        // Log successful authentication
-        System.out.println("User authenticated: " + username);
-        
-        // Request continues to the resource method
+        requestContext.setSecurityContext(new MyCustomSecurityContext(authenticatedUser, scheme));
+
+        // === 3) RBAC: evaluate security annotations ===
+        Method method = resourceInfo.getResourceMethod();
+        Class<?> resourceClass = resourceInfo.getResourceClass();
+
+        // Method-level annotations take priority
+        if (method.isAnnotationPresent(DenyAll.class)) {
+            abort403(requestContext, "Access blocked for all users.");
+            return;
+        }
+        if (method.isAnnotationPresent(PermitAll.class)) {
+            return; // allow for everyone
+        }
+        if (method.isAnnotationPresent(RolesAllowed.class)) {
+            if (!rolesMatch(requestContext, method.getAnnotation(RolesAllowed.class))) {
+                handleAuthzFailure(requestContext);
+            }
+            return;
+        }
+
+        // If no method-level annotations, check class-level
+        if (resourceClass.isAnnotationPresent(DenyAll.class)) {
+            abort403(requestContext, "Access blocked for all users.");
+            return;
+        }
+        if (resourceClass.isAnnotationPresent(PermitAll.class)) {
+            return;
+        }
+        if (resourceClass.isAnnotationPresent(RolesAllowed.class)) {
+            if (!rolesMatch(requestContext, resourceClass.getAnnotation(RolesAllowed.class))) {
+                handleAuthzFailure(requestContext);
+            }
+        }
+        // If no annotations at all → allow
     }
-    
+
     /**
-     * Helper method to abort request with 401 Unauthorized
-     * 
-     * @param requestContext The request context
-     * @param message Error message to return
+     * Checks if the current SecurityContext has at least one of the allowed roles.
      */
-    private void abortWithUnauthorized(ContainerRequestContext requestContext, String message) {
-        // Create error response
+    private boolean rolesMatch(ContainerRequestContext ctx, RolesAllowed ra) {
+        for (String role : ra.value()) {
+            if (ctx.getSecurityContext().isUserInRole(role)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Distinguish between unauthenticated (401) and unauthorized (403).
+     */
+    private void handleAuthzFailure(ContainerRequestContext ctx) {
+        if (ctx.getSecurityContext() == null || ctx.getSecurityContext().getUserPrincipal() == null) {
+            abort401(ctx, "Authentication required");
+        } else {
+            abort403(ctx, "Insufficient role");
+        }
+    }
+
+    /**
+     * Abort with 401 Unauthorized.
+     */
+    private void abort401(ContainerRequestContext ctx, String message) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", message);
-        
-        // Build 401 response
-        Response response = Response.status(Response.Status.UNAUTHORIZED)
+        ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED)
                 .entity(errorResponse)
-                .header("WWW-Authenticate", "Basic realm=\"StudyStart JYU API\"")  // Standard Basic Auth header
-                .build();
-        
-        // Abort the request with this response
-        requestContext.abortWith(response);
-        
-        System.out.println("Authentication failed: " + message);
+                .header("WWW-Authenticate", "Basic realm=\"StudyStart JYU API\"")
+                .build());
+        System.out.println("401 Unauthorized: " + message);
+    }
+
+    /**
+     * Abort with 403 Forbidden.
+     */
+    private void abort403(ContainerRequestContext ctx, String message) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", message);
+        ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
+                .entity(errorResponse)
+                .build());
+        System.out.println("403 Forbidden: " + message);
     }
 }
