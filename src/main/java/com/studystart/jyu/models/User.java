@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import com.studystart.jyu.security.Role;
 
 /**
  * User entity representing a registered user in the system.
@@ -16,7 +17,7 @@ public class User implements Principal {
     private String firstName;
     private String lastName;
     private String passwordHash;
-    private List<String> roles;
+    private List<Role> roles;
     private long createdAt;
     
     // Default constructor
@@ -76,16 +77,16 @@ public class User implements Principal {
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
-    
-    public List<String> getRoles() {
+
+    public List<Role> getRoles() {
         return roles;
     }
-    
-    public void setRoles(List<String> roles) {
+
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
-    
-    public void addRole(String role) {
+
+    public void addRole(Role role) {
         if (!this.roles.contains(role)) {
             this.roles.add(role);
         }
