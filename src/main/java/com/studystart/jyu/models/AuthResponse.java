@@ -2,16 +2,18 @@ package com.studystart.jyu.models;
 
 import java.util.List;
 
+import com.studystart.jyu.security.Role;
+
 public class AuthResponse {
     private String token;
     private String tokenType = "Bearer";
-    private long expiresIn; // seconds
+    private long expiresIn;
     private String username;
-    private List<String> roles;
+    private List<Role> roles;
 
     public AuthResponse() {}
 
-    public AuthResponse(String token, long expiresIn, String username, List<String> roles) {
+    public AuthResponse(String token, long expiresIn, String username, List<Role> roles) {
         this.token = token;
         this.expiresIn = expiresIn;
         this.username = username;
@@ -22,5 +24,5 @@ public class AuthResponse {
     public String getTokenType() { return tokenType; }
     public long getExpiresIn() { return expiresIn; }
     public String getUsername() { return username; }
-    public List<String> getRoles() { return roles; }
+    public List<Role> getRoles() { return roles; }
 }
