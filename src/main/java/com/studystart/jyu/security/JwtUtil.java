@@ -3,6 +3,7 @@ package com.studystart.jyu.security;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -63,10 +64,14 @@ public class JwtUtil {
 
         String username = (String) payload.get("sub");
         @SuppressWarnings("unchecked")
-        List<Role> roles = (List<Role>) payload.get("roles");
+        List<String> roles = (List<String>) payload.get("roles");
         if (roles == null) roles = Collections.emptyList();
+        List<Role> decodedAsEnums = roles.stream()
+        	    .map(o -> Role.valueOf(o.toString()))
+        	    .collect(Collectors.toList());
+        
 
-        return new Decoded(username, roles, exp);
+        return new Decoded(username, decodedAsEnums, exp);
     }
 
     public static final class Decoded {

@@ -19,10 +19,12 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Authentication + RBAC Filter:
@@ -78,6 +80,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             try {
                 if (auth.startsWith(BEARER_PREFIX)) {
                     authenticatedUser = authenticateBearer(auth.substring(BEARER_PREFIX.length()).trim());
+                    System.out.println(authenticatedUser);
                 } else if (auth.startsWith(BASIC_PREFIX)) {
                     authenticatedUser = authenticateBasic(auth.substring(BASIC_PREFIX.length()).trim());
                 } else {
@@ -160,10 +163,24 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private User authenticateBearer(String token) {
         JwtUtil.Decoded decoded = jwt.validateAndDecode(token);
-        User u = new User();
-        u.setUsername(decoded.username);
-        u.setRoles(decoded.roles);
+        long now = Instant.now().getEpochSecond();
+        boolean isExpired = now >= decoded.exp;
+        if (isExpired) {
+        	throw new JwtUtil.JwtExpiredException("Token expired");
+        }
+        
+        User u = userService.getUserWithPassword(decoded.username);
+        System.out.println(u);
+        if (u == null) {
+        	throw new JwtUtil.JwtException("Invalid token");
+        }
+        
+        if (!decoded.roles.equals(u.getRoles())) {
+        	throw new JwtUtil.JwtException("Invalid token");
+        }
+
         return u;
+        
     }
 
     private void setGuestContext(ContainerRequestContext ctx) {
