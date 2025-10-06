@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "b14f1b89-c8be-4fa6-a7b7-71e64b1ffbcb",
+		"_postman_id": "b1a53a5a-27b1-443c-a147-394bea14e973",
 		"name": "StudyStart JYU TASK 4 - Registration and Authentication",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "48650280",
-		"_collection_link": "https://sayeemhossain-sadat-5229829.postman.co/workspace/Mohammad-Sayeem-Sadat-Hossain's~7a92d6d1-add7-4384-82a4-786062cb8190/collection/48650280-b14f1b89-c8be-4fa6-a7b7-71e64b1ffbcb?action=share&source=collection_link&creator=48650280"
+		"_exporter_id": "48849907",
+		"_collection_link": "https://nnahid878-8212314.postman.co/workspace/Mushfiqul-lslam-Chowdhury's-Wor~a0fe1e29-f74a-4b14-82c2-a04bd28fcb7f/collection/48849907-b1a53a5a-27b1-443c-a147-394bea14e973?action=share&source=collection_link&creator=48849907"
 	},
 	"item": [
 		{
@@ -739,6 +739,245 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "23: POST Register Fourth User (Mushfiqul Islam Chowdhury)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"mushfiqulislam\",\r\n  \"email\": \"mushfiqulislamchowdhury@gmail.com\",\r\n  \"firstName\": \"Mushfiqul Islam\",\r\n  \"lastName\": \"Chowdhury\",\r\n  \"password\": \"mictest@123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "24: POST JWT Based Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"mushfiqulislam\", \r\n    \"password\": \"mictest@123\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "24: POST JWT Based Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"mushfiqulislam\", \r\n    \"password\": \"mictest@123\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/studystart/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"studystart",
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "307"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 06 Oct 2025 09:53:30 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"expiresIn\": 3600,\n    \"roles\": [\n        \"USER\"\n    ],\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdHVkeXN0YXJ0LWp5dSIsInN1YiI6Im11c2hmaXF1bGlzbGFtIiwiaWF0IjoxNzU5NzQ0NDEwLCJleHAiOjE3NTk3NDgwMTAsInJvbGVzIjpbIlVTRVIiXX0.q9Z8_bStrRk_c74eEePBDyUtmZFBn-HaSvNUSzFQwwo\",\n    \"tokenType\": \"Bearer\",\n    \"username\": \"mushfiqulislam\"\n}"
+				}
+			]
+		},
+		{
+			"name": "25: GET other User's data with JWT",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdHVkeXN0YXJ0LWp5dSIsInN1YiI6Im11c2hmaXF1bGlzbGFtIiwiaWF0IjoxNzU5NzAxNDk1LCJleHAiOjE3NTk3MDUwOTUsInJvbGVzIjpbIlVTRVIiXX0.pkh3rrUZYvMGLWiOaBB4lf0Cxwl7jVkQZP133RWmL2c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/users/rakibul_hasan_remon",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"users",
+						"rakibul_hasan_remon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "26: GET Current User's with JWT Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdHVkeXN0YXJ0LWp5dSIsInN1YiI6Im11c2hmaXF1bGlzbGFtIiwiaWF0IjoxNzU5NzAxNDk1LCJleHAiOjE3NTk3MDUwOTUsInJvbGVzIjpbIlVTRVIiXX0.pkh3rrUZYvMGLWiOaBB4lf0Cxwl7jVkQZP133RWmL2c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/users/rakibul_hasan_remon",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"users",
+						"rakibul_hasan_remon"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "26: GET other User's data with JWT Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/studystart/api/users/mushfiqulislam",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"studystart",
+								"api",
+								"users",
+								"mushfiqulislam"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "169"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 06 Oct 2025 09:58:55 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"createdAt\": 1759744715356,\n    \"email\": \"mushfiqulislamchowdhury@gmail.com\",\n    \"firstName\": \"Mushfiqul Islam\",\n    \"lastName\": \"Chowdhury\",\n    \"roles\": [\n        \"USER\"\n    ],\n    \"username\": \"mushfiqulislam\"\n}"
+				}
+			]
 		}
 	]
 }
