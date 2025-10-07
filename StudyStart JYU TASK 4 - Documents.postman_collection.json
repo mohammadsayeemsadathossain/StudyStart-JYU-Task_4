@@ -1,0 +1,375 @@
+{
+  "info": {
+    "name": "StudyStart — Documents by Profile Username",
+    "_postman_id": "b52a2b3c-7c9e-4b4f-9a71-2f7b8fae1c99",
+    "description": "Documents endpoints addressed by /profiles/{username}/documents/… with Basic Auth and JWT variants.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/studystart/api"
+    },
+    {
+      "key": "username",
+      "value": "marta"
+    },
+    {
+      "key": "documentId",
+      "value": "1"
+    },
+    {
+      "key": "basicUser",
+      "value": "admin"
+    },
+    {
+      "key": "basicPass",
+      "value": "admin123"
+    },
+    {
+      "key": "jwtToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Documents (Basic Auth)",
+      "item": [
+        {
+          "name": "GET documents (list) — guest allowed",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents" ]
+            },
+            "description": "Returns a list of documents for the given profile username (public read)."
+          }
+        },
+        {
+          "name": "GET one document — Basic",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Returns details of a specific document. USER → own doc; ADMIN → any."
+          }
+        },
+        {
+          "name": "POST new document — Basic",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": \"PASSPORT\",\n  \"fileName\": \"passport_marta.pdf\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents" ]
+            },
+            "description": "Create a document for the given username. USER can only create for self; ADMIN for anyone."
+          }
+        },
+        {
+          "name": "PUT document — Basic (update)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": \"PASSPORT\",\n  \"fileName\": \"passport_marta_v2.pdf\",\n  \"status\": \"VERIFIED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Update existing document. USER → only own docs; ADMIN → any."
+          }
+        },
+        {
+          "name": "DELETE document — Basic (admin only)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Delete a document (ADMIN only)."
+          }
+        },
+        {
+          "name": "UPLOAD file — Basic (User/Admin)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicUser}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicPass}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": { "src": "" }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/new/PASSPORT/upload",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "new", "PASSPORT", "upload" ]
+            },
+            "description": "Binary upload (PDF/JPEG/PNG). Set Content-Type accordingly and pick a file in Postman."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documents (JWT)",
+      "item": [
+        {
+          "name": "GET documents (list) — guest allowed",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents" ]
+            },
+            "description": "Public list. JWT not required for this endpoint."
+          }
+        },
+        {
+          "name": "GET one document — JWT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwtToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Get details. USER → own doc; ADMIN → any."
+          }
+        },
+        {
+          "name": "POST new document — JWT",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwtToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": \"RP_CARD\",\n  \"fileName\": \"rp_card.jpg\",\n  \"status\": \"UPLOADED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents" ]
+            },
+            "description": "Create using JWT."
+          }
+        },
+        {
+          "name": "PUT document — JWT (update)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwtToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": \"RP_CARD\",\n  \"fileName\": \"rp_card_updated.jpg\",\n  \"status\": \"VERIFIED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Update using JWT."
+          }
+        },
+        {
+          "name": "DELETE document — JWT (admin only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwtToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/{{documentId}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "{{documentId}}" ]
+            },
+            "description": "Admin-only delete via JWT."
+          }
+        },
+        {
+          "name": "UPLOAD file — JWT (User/Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwtToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": { "src": "" }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{username}}/documents/new/PASSPORT/upload",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "profiles", "{{username}}", "documents", "new", "PASSPORT", "upload" ]
+            },
+            "description": "Binary upload via JWT (PDF/JPEG/PNG)."
+          }
+        }
+      ]
+    }
+  ]
+}
