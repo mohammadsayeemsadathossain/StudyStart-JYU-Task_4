@@ -16,29 +16,24 @@ interface UserResponse {
 
 export default function ProfilesPage() {
   const [users, setUsers] = useState<UserResponse[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [filtered, setFiltered] = useState<UserResponse[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
   const token = localStorage.getItem("jwtToken");
-  const username = localStorage.getItem("username"); // store this at login
+  const username = localStorage.getItem("username");
+
+  const isGuest = !token || !username;
 
   useEffect(() => {
-
-    if (!token || !username) {
-      setError("You are not logged in.");
-      setLoading(false);
-      return;
-    }
-
     fetch(`http://localhost:8080/studystart/api/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     })
       .then(async (res) => {
@@ -52,15 +47,14 @@ export default function ProfilesPage() {
 
         if (res.ok) {
           setUsers(data);
-           setFiltered(data);
-          console.log(data);
+          setFiltered(data);
         } else {
           setError(data?.error || "Failed to fetch user info");
         }
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token, username]);
+  }, [token]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -76,8 +70,9 @@ export default function ProfilesPage() {
   };
 
   const isAdmin = () => {
+    if (!token) return false;
     try {
-      const tokenData = JSON.parse(atob(token!.split(".")[1]));
+      const tokenData = JSON.parse(atob(token.split(".")[1]));
       return tokenData.roles && tokenData.roles.includes("ADMIN");
     } catch {
       return false;
@@ -89,9 +84,7 @@ export default function ProfilesPage() {
     try {
       const res = await fetch(`http://localhost:8080/studystart/api/users/${usernameToDelete}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
@@ -111,12 +104,20 @@ export default function ProfilesPage() {
     alert(`Editing profile: ${user.username}\n(you can implement an edit form here)`);
   };
 
-  if (loading) return <p>Loading user info...</p>;
+  if (loading) return <p>Loading profiles...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="profiles-container">
-      <h2 className="profiles-title">All Profiles</h2>
+      <h2 className="profiles-title">
+        {isGuest ? "Welcome, Guest!" : "All Profiles"}
+      </h2>
+
+      {isGuest && (
+        <p style={{ color: "gray" }}>
+          You can view profiles, but functionality is limited.
+        </p>
+      )}
 
       <div className="profiles-search-bar">
         <input
@@ -125,53 +126,40 @@ export default function ProfilesPage() {
           onChange={handleSearch}
           placeholder="Search by username or name..."
         />
-        <button onClick={() => navigate("/")}>Back Home</button>
+        <button onClick={() => navigate("/")} className="btn btn-blue">
+          Back Home
+        </button>
       </div>
 
       <div className="profiles-list">
-        {filtered.length === 0 && (
-          <p className="no-profiles">No profiles found.</p>
-        )}
+        {filtered.length === 0 && <p className="no-profiles">No profiles found.</p>}
 
         {filtered.map((user) => (
           <div key={user.username} className="profile-card">
             <div className="profile-info">
-              <p className="profile-name">
-                {user.firstName} {user.lastName}
-              </p>
+              <p className="profile-name">{user.firstName} {user.lastName}</p>
               <p className="profile-username">@{user.username}</p>
               <p className="profile-email">{user.email}</p>
               {user.roles && (
                 <p className="profile-roles">
                   <strong>Roles:</strong>{" "}
                   {Array.isArray(user.roles)
-                    ? user.roles
-                        .map((r) => (typeof r === "string" ? r : r.name))
-                        .join(", ")
+                    ? user.roles.map((r) => (typeof r === "string" ? r : r.name)).join(", ")
                     : ""}
                 </p>
               )}
             </div>
 
+            {/* Only show actions to admins */}
             {isAdmin() && (
               <div className="profile-actions">
-                <button
-                  onClick={() => handleEdit(user)}
-                  className="profile-btn edit"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(user.username)}
-                  className="profile-btn delete"
-                >
-                  Delete
-                </button>
+                <button onClick={() => handleEdit(user)} className="profile-btn edit">Edit</button>
+                <button onClick={() => handleDelete(user.username)} className="profile-btn delete">Delete</button>
               </div>
             )}
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

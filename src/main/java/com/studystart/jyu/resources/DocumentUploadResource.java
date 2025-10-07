@@ -62,7 +62,7 @@ public class DocumentUploadResource {
 	 * Uploads a raw file body (PDF/JPEG/PNG) and registers a Document entry.
 	 */
 	@POST
-	@Path("/upload")
+	@Path("/")
 	@Consumes({ "application/pdf", "image/jpeg", "image/png" })
 	@RolesAllowed({ "USER", "ADMIN" })
 	public Response uploadFile(@PathParam("username") String username,

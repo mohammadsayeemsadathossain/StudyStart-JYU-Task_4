@@ -7,10 +7,12 @@ import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilesPage from './pages/Profiles';
 import DocumentsPage from './pages/Documents';
+import Header from './components/Header';
 
 function App() {
   return (
     <Router>
+      <Header />
       <Routes>
         <Route path='/register' element={<RegisterPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>

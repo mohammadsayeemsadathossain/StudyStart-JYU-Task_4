@@ -43,7 +43,15 @@
 }
 
 .btn-blue {
-  background-color: #2563eb;
+  margin-left: 12px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
 }
 
 .btn-blue:hover {
@@ -51,7 +59,15 @@
 }
 
 .btn-green {
-  background-color: #16a34a;
+  margin-left: 12px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
 }
 
 .btn-green:hover {

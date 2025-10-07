@@ -23,10 +23,11 @@ export default function HomePage() {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    const username = localStorage.getItem("username"); // store this at login
+    const storedUser = localStorage.getItem("user");
+    const username = storedUser ? JSON.parse(storedUser).username : null;
 
     if (!token || !username) {
-      setError("You are not logged in.");
+      setUser(null);
       setLoading(false);
       return;
     }
@@ -59,6 +60,29 @@ export default function HomePage() {
 
   if (loading) return <p>Loading user info...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  if (!user) {
+    return (
+      <div className="home-container">
+        <h2 className="home-title">Welcome, Guest!</h2>
+        <p style={{ color: "gray" }}>Functionality is limited.</p>
+        <div className="home-buttons">
+          <button
+            onClick={() => navigate("/profiles")}
+            className="btn btn-blue"
+          >
+            Go to Profiles
+          </button>
+          <button
+            onClick={() => navigate("/documents")}
+            className="btn btn-green"
+          >
+            Go to Documents
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const rolesDisplay = user?.roles
     ? (user.roles as any[]).map((r) => (typeof r === "string" ? r : r.name)).join(", ")

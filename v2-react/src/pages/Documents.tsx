@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UploadModal from "../components/UploadModal"; 
-//import './documents.css';
+import '../styles/Documents.css';
+import EditDocumentModal from "../components/EditModal";
 
 interface User {
   username: string;
@@ -29,6 +30,8 @@ const DocumentsPage: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editDoc, setEditDoc] = useState<Document | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isAdmin = user?.roles.includes("ADMIN");
 
@@ -73,7 +76,7 @@ const DocumentsPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const uploadUrl = `${API_BASE}/profiles/${user.username}/documents/new/${type}/upload`;
+      const uploadUrl = `${API_BASE}/profiles/${user.username}/documents/new/${type}/`;
 
       const res = await fetch(uploadUrl, {
         method: "POST",
@@ -115,14 +118,33 @@ const DocumentsPage: React.FC = () => {
     }
   };
 
-  const handleDownload = (doc: Document) => {
-    const link = document.createElement("a");
-    link.href = `${API_BASE}/uploads/${doc.fileName}`;
-    link.download = doc.fileName;
-    link.click();
-  };
+  const handleEdit = (doc: Document) => {
+  setEditDoc(doc);
+  setIsEditModalOpen(true);
+};
 
-  // Debug log for button condition
+const handleSaveEdit = async (docId: number, updatedDoc: { documentType: string; fileName: string }) => {
+  if (!user) return;
+  try {
+    const res = await fetch(`${API_BASE}/profiles/${user.username}/documents/${docId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
+      },
+      body: JSON.stringify(updatedDoc),
+    });
+    if (!res.ok) throw new Error("Update failed");
+    await fetchDocuments();
+    setIsEditModalOpen(false);
+    setEditDoc(null);
+  } catch (err) {
+    console.error("Update error:", err);
+    alert("Failed to update document.");
+  }
+};
+
+  
   console.log("Render check - User:", user, "isAdmin:", isAdmin, "Has USER role:", user?.roles.includes("USER"));
 
   return (
@@ -167,11 +189,18 @@ const DocumentsPage: React.FC = () => {
             </div>
             <div className="document-actions">
               <button
-                onClick={() => handleDownload(doc)}
-                className="download-button"
+                onClick={() => handleEdit(doc)}
+                className="edit-button"
               >
-                Download
+                Edit
               </button>
+
+              <EditDocumentModal
+                isOpen={isEditModalOpen}
+                document={editDoc}
+                onClose={() => setIsEditModalOpen(false)}
+                onSave={handleSaveEdit}
+                />
               {isAdmin && (
                 <button
                   onClick={() => handleDelete(doc.id)}
