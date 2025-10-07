@@ -11,7 +11,7 @@ import com.studystart.jyu.security.Role;
  * Implements Principal for security context integration.
  */
 public class User implements Principal {
-    
+
     private String username;
     private String email;
     private String firstName;
@@ -111,7 +111,7 @@ public class User implements Principal {
      * Returns a safe copy of user without password hash
      */
     public User getSafeUser() {
-        User safeUser = new User(this.username, this.email, this.firstName, this.lastName);
+        User safeUser = new User( this.username, this.email, this.firstName, this.lastName);
         safeUser.setRoles(new ArrayList<>(this.roles));
         safeUser.setCreatedAt(this.createdAt);
         return safeUser;

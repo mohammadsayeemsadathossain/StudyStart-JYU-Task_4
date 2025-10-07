@@ -32,11 +32,11 @@ import java.util.Map;
 
 /**
  * Upload endpoint for raw PDF/JPEG/PNG bodies.
- * Path example: POST /profiles/{profileId}/documents/new/{documentType}/upload
+ * Path example: POST /profiles/{username}/documents/new/{documentType}/upload
  *
  * RBAC: USER or ADMIN only. Guests cannot upload.
  */
-@Path("/profiles/{profileId}/documents/new/{documentType}")
+@Path("/profiles/{username}/documents/new/{documentType}")
 @Produces(MediaType.APPLICATION_JSON)
 public class DocumentUploadResource {
 
@@ -65,7 +65,7 @@ public class DocumentUploadResource {
 	@Path("/upload")
 	@Consumes({ "application/pdf", "image/jpeg", "image/png" })
 	@RolesAllowed({ "USER", "ADMIN" })
-	public Response uploadFile(@PathParam("profileId") long profileId,
+	public Response uploadFile(@PathParam("username") String username,
 							   @PathParam("documentType") String docTypeRaw,
 							   InputStream bodyStream,
 							   @Context UriInfo uriInfo,
@@ -95,7 +95,14 @@ public class DocumentUploadResource {
 
 		// Build Document model
 		Document doc = new Document();
-		doc.setProfileId(profileId);
+		doc.setUsername(username);
+		if (!sc.isUserInRole("ADMIN")) {
+			doc.setOwnerUsername(me);     // normal USER can only upload for self
+		} else {
+			if (doc.getOwnerUsername() == null || doc.getOwnerUsername().isEmpty()) {
+				doc.setOwnerUsername(username); // ADMIN uploading for someone else
+			}
+		}
 		doc.setDocumentType(docTypeRaw); // setter maps String -> enum inside the model
 		doc.setFileName(storedName);
 		doc.setStoragePath(target.toString());
@@ -112,15 +119,15 @@ public class DocumentUploadResource {
 		}
 
 		// Persist via service
-		Document created = documentService.addDocument(profileId, doc);
+		Document created = documentService.addDocument(username, doc);
 
 		// HATEOAS links
-		addLinks(created, profileId, uriInfo);
+		addLinks(created, username, uriInfo);
 
-		// Location of the created resource: /profiles/{profileId}/documents/{id}
+		// Location of the created resource: /profiles/{username}/documents/{id}
 		URI location = uriInfo.getBaseUriBuilder()
 				.path("profiles")
-				.path(String.valueOf(profileId))
+				.path(username)
 				.path("documents")
 				.path(String.valueOf(created.getId()))
 				.build();
@@ -133,10 +140,10 @@ public class DocumentUploadResource {
 
 	// --- links & helpers ---
 
-	private void addLinks(Document document, long profileId, UriInfo uriInfo) {
+	private void addLinks(Document document, String username, UriInfo uriInfo) {
 		String selfUri = uriInfo.getBaseUriBuilder()
 				.path("profiles")
-				.path(Long.toString(profileId))
+				.path(username)
 				.path("documents")
 				.path(Long.toString(document.getId()))
 				.build()
@@ -145,7 +152,7 @@ public class DocumentUploadResource {
 
 		String profileUri = uriInfo.getBaseUriBuilder()
 				.path("profiles")
-				.path(Long.toString(profileId))
+				.path(username)
 				.build()
 				.toString();
 		document.addLink(profileUri, "profile");

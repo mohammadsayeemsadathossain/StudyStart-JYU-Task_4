@@ -1,0 +1,195 @@
+import React, { useEffect, useState } from "react";
+import UploadModal from "../components/UploadModal"; 
+//import './documents.css';
+
+interface User {
+  username: string;
+  roles: string[];
+  // Added optional fields to match the saved user object structure
+  createdAt?: number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+interface Document {
+  id: number;
+  username: string;
+  documentType: string;
+  fileName: string;
+  contentType: string;
+  status: string;
+  uploadDate: string;
+}
+
+const API_BASE = "http://localhost:8080/studystart/api";
+
+const DocumentsPage: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isAdmin = user?.roles.includes("ADMIN");
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        console.log("Parsed user from localStorage:", parsedUser); // Debug log to verify user loading
+        setUser(parsedUser);
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) fetchDocuments();
+  }, [user]);
+
+  const fetchDocuments = async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/profiles/${user.username}/documents`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch documents");
+      const data = await res.json();
+      setDocuments(data);
+    } catch (err) {
+      console.error("Error fetching documents", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpload = async (file: File, type: string) => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const uploadUrl = `${API_BASE}/profiles/${user.username}/documents/new/${type}/upload`;
+
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": file.type,
+          Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
+        },
+        body: file,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      alert("File uploaded successfully!");
+      await fetchDocuments();
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to upload document.");
+    } finally {
+      setLoading(false);
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleDelete = async (docId: number) => {
+    if (!isAdmin || !user) return;
+    if (!window.confirm("Are you sure you want to delete this document?")) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/profiles/${user.username}/documents/${docId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
+        },
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      await fetchDocuments();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
+  const handleDownload = (doc: Document) => {
+    const link = document.createElement("a");
+    link.href = `${API_BASE}/uploads/${doc.fileName}`;
+    link.download = doc.fileName;
+    link.click();
+  };
+
+  // Debug log for button condition
+  console.log("Render check - User:", user, "isAdmin:", isAdmin, "Has USER role:", user?.roles.includes("USER"));
+
+  return (
+    <div className="documents-container">
+      <h1 className="documents-heading">Documents</h1>
+
+      {loading && <p className="loading-message">Loading...</p>}
+
+      {user && (
+        <p className="logged-in-message">
+          Logged in as: <strong>{user.username}</strong> ({user.roles.join(", ")})
+        </p>
+      )}
+
+      {/* Upload button */}
+      {user && (user.roles.includes("USER") || isAdmin) && (
+        <div className="upload-section">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="upload-button"
+          >
+            Upload new document
+          </button>
+        </div>
+      )}
+
+      {/* Upload modal */}
+      <UploadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUpload={handleUpload}
+      />
+
+      <div className="documents-list">
+        {documents.map((doc) => (
+          <div key={doc.id} className="document-card">
+            <div className="document-info">
+              <p className="document-file"><strong>File:</strong> {doc.fileName}</p>
+              <p className="document-type"><strong>Type:</strong> {doc.documentType}</p>
+              <p className="document-status"><strong>Status:</strong> {doc.status}</p>
+              <p className="document-date"><strong>Uploaded:</strong> {doc.uploadDate}</p>
+            </div>
+            <div className="document-actions">
+              <button
+                onClick={() => handleDownload(doc)}
+                className="download-button"
+              >
+                Download
+              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => handleDelete(doc.id)}
+                  className="delete-button"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {documents.length === 0 && !loading && (
+          <p className="no-documents">No documents found.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default DocumentsPage;

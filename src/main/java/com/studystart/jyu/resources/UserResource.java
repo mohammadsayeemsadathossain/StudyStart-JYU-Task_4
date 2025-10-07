@@ -77,7 +77,7 @@ public class UserResource {
      * Public: visible to guests (e.g., sanitized list).
      */
     @GET
-    @RolesAllowed("ADMIN")
+    @PermitAll
     public Response getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
         return Response.ok(users).build();
