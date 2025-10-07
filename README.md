@@ -194,7 +194,7 @@ Preconfigured Postman collection(s) available under:
 | Method | Path                                   | Access               | Description     |
 | ------ | -------------------------------------- | -------------------- | --------------- |
 | GET    | `/profiles/{profileId}/documents`      | Guest / User / Admin | List documents  |
-| GET    | `/profiles/{profileId}/documents/{id}` | Guest / User / Admin | View document   |
+| GET    | `/profiles/{profileId}/documents/{id}` | User / Admin         | View document   |
 | POST   | `/profiles/{profileId}/documents`      | User / Admin         | Upload document |
 | PUT    | `/profiles/{profileId}/documents/{id}` | User / Admin         | Update document |
 | DELETE | `/profiles/{profileId}/documents/{id}` | Admin                | Delete document |
