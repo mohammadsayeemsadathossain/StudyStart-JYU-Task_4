@@ -8,7 +8,7 @@ import java.util.List;
 @XmlRootElement
 public class Document {
     private long id;
-    private long profileId;
+    private String username;
     private DocumentType documentType;
     private String fileName;
     private String status;
@@ -24,10 +24,10 @@ public class Document {
     
     public Document() {}
     
-    public Document(long id, long profileId, String documentType, 
+    public Document(long id, String username, String documentType, 
                    String fileName, String status) {
         this.id = id;
-        this.profileId = profileId;
+        this.username = username;
         this.documentType = DocumentType.fromString(documentType);
         this.fileName = fileName;
         this.status = status;
@@ -43,8 +43,8 @@ public class Document {
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
     
-    public long getProfileId() { return profileId; }
-    public void setProfileId(long profileId) { this.profileId = profileId; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     
     public String getDocumentType() {
     	return documentType != null ? documentType.name() : null;

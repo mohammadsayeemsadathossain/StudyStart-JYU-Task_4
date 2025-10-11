@@ -12,14 +12,14 @@ import java.util.List;
 
 /**
  * Document endpoints scoped under a profile:
- *   Base path: /profiles/{profileId}/documents
+ *   Base path: /profiles/{username}/documents
  *
  * RBAC:
  *   - GET list / GET one: @PermitAll (guest allowed)
  *   - POST / PUT: @RolesAllowed({"USER","ADMIN"})  (USER may only manage own docs)
  *   - DELETE: @RolesAllowed("ADMIN")
  */
-@Path("/profiles/{profileId}/documents")
+@Path("/profiles/{username}/documents")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class DocumentResource {
@@ -29,11 +29,11 @@ public class DocumentResource {
     /** Public list (guest/user/admin) */
     @GET
     @PermitAll
-    public List<Document> getDocuments(@PathParam("profileId") long profileId,
+    public List<Document> getDocuments(@PathParam("username") String username,
                                        @Context UriInfo uriInfo) {
-        List<Document> documents = documentService.getAllDocuments(profileId);
+        List<Document> documents = documentService.getAllDocuments(username);
         for (Document d : documents) {
-            addLinks(d, profileId, uriInfo);
+            addLinks(d, username, uriInfo);
         }
         return documents;
     }
@@ -41,19 +41,19 @@ public class DocumentResource {
     /** Public get (guest/user/admin). If you want it private, change to @RolesAllowed({"USER","ADMIN"}). */
     @GET
     @Path("/{documentId}")
-    @PermitAll
-    public Document getDocument(@PathParam("profileId") long profileId,
+    @RolesAllowed({"USER","ADMIN"})
+    public Document getDocument(@PathParam("username") String username,
                                 @PathParam("documentId") long documentId,
                                 @Context UriInfo uriInfo) {
-        Document document = documentService.getDocument(profileId, documentId);
-        addLinks(document, profileId, uriInfo);
+        Document document = documentService.getDocument(username, documentId);
+        addLinks(document, username, uriInfo);
         return document;
     }
 
     /** Create: USER or ADMIN. USER can only create for self (owner = current user). */
     @POST
     @RolesAllowed({"USER","ADMIN"})
-    public Response addDocument(@PathParam("profileId") long profileId,
+    public Response addDocument(@PathParam("username") String username,
                                 Document document,
                                 @Context UriInfo uriInfo,
                                 @Context SecurityContext sc) {
@@ -72,8 +72,8 @@ public class DocumentResource {
             throw new BadRequestException("documentType is required (PASSPORT, RP_CARD, ACCEPTANCE_LETTER)");
         }
 
-        Document newDocument = documentService.addDocument(profileId, document);
-        addLinks(newDocument, profileId, uriInfo);
+        Document newDocument = documentService.addDocument(username, document);
+        addLinks(newDocument, username, uriInfo);
 
         URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(newDocument.getId()))
@@ -85,21 +85,21 @@ public class DocumentResource {
     @PUT
     @Path("/{documentId}")
     @RolesAllowed({"USER","ADMIN"})
-    public Document updateDocument(@PathParam("profileId") long profileId,
+    public Document updateDocument(@PathParam("username") String username,
                                    @PathParam("documentId") long documentId,
                                    Document document,
                                    @Context UriInfo uriInfo,
                                    @Context SecurityContext sc) {
         // Fetch existing to check ownership
-        Document existing = documentService.getDocument(profileId, documentId);
+        Document existing = documentService.getDocument(username, documentId);
         if (!(sc.isUserInRole("ADMIN") || isOwner(sc, existing.getOwnerUsername()))) {
             throw new ForbiddenException("Not allowed to modify this document");
         }
 
         // Keep ID consistent and update
         document.setId(documentId);
-        Document updated = documentService.updateDocument(profileId, document);
-        addLinks(updated, profileId, uriInfo);
+        Document updated = documentService.updateDocument(username, document);
+        addLinks(updated, username, uriInfo);
         return updated;
     }
 
@@ -107,29 +107,29 @@ public class DocumentResource {
     @DELETE
     @Path("/{documentId}")
     @RolesAllowed("ADMIN")
-    public Response deleteDocument(@PathParam("profileId") long profileId,
+    public Response deleteDocument(@PathParam("username") String username,
                                    @PathParam("documentId") long documentId) {
-        documentService.removeDocument(profileId, documentId);
+        documentService.removeDocument(username, documentId);
         return Response.noContent().build();
     }
 
     // --- HATEOAS links (simple, string-based) ---
 
-    private void addLinks(Document document, long profileId, UriInfo uriInfo) {
-        // Self: /profiles/{profileId}/documents/{id}
+    private void addLinks(Document document, String username, UriInfo uriInfo) {
+        // Self: /profiles/{username}/documents/{id}
         String selfUri = uriInfo.getBaseUriBuilder()
                 .path("profiles")
-                .path(Long.toString(profileId))
+                .path(username)
                 .path("documents")
                 .path(Long.toString(document.getId()))
                 .build()
                 .toString();
         document.addLink(selfUri, "self");
 
-        // Profile: /profiles/{profileId}
+        // Profile: /profiles/{username}
         String profileUri = uriInfo.getBaseUriBuilder()
                 .path("profiles")
-                .path(Long.toString(profileId))
+                .path(username)
                 .build()
                 .toString();
         document.addLink(profileUri, "profile");
