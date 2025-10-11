@@ -63,13 +63,24 @@ const DocumentsPage: React.FC = () => {
       });
       if (!res.ok) throw new Error("Failed to fetch documents");
       const data = await res.json();
-      setDocuments(data);
+      console.log("Fetched documents data:", data);
+
+      if (Array.isArray(data)) {
+        setDocuments(data);
+      } else if (Array.isArray(data.documents)) {
+        setDocuments(data.documents);
+      } else {
+        console.warn("Unexpected data format:", data);
+        setDocuments([]);
+      }
     } catch (err) {
       console.error("Error fetching documents", err);
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleUpload = async (file: File, type: string) => {
     if (!user) return;
