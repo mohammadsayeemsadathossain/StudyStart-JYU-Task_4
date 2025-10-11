@@ -1,5 +1,6 @@
 package com.studystart.jyu.resources;
 
+import com.studystart.jyu.models.LinkRef;
 import com.studystart.jyu.models.RegistrationRequest;
 import com.studystart.jyu.models.User;
 import com.studystart.jyu.models.UserResponse;
@@ -13,9 +14,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.studystart.jyu.resources.LinkBuilder.link;
 
 /**
  * REST Resource for user management
@@ -25,7 +31,10 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 
-    private final UserService userService = new UserService();
+	@Context UriInfo uriInfo;
+    @Context SecurityContext sc;
+    
+	private final UserService userService = new UserService();
 
     /**
      * Register a new user
@@ -50,6 +59,10 @@ public class UserResource {
             );
 
             UserResponse registeredUser = userService.registerUser(newUser, request.getPassword());
+            List<LinkRef> links = new ArrayList<>();
+            links.add(link(uriInfo, "users/" + registeredUser.getUsername(), "self"));
+            links.add(link(uriInfo, "profiles/" + registeredUser.getUsername() + "/documents", "documents"));
+            registeredUser.setLinks(links);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User registered successfully");
@@ -93,11 +106,17 @@ public class UserResource {
     public Response getUser(@PathParam("username") String username,
                             @Context SecurityContext securityContext) {
         UserResponse user = userService.getUserResponse(username);
+        
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(createErrorResponse("User not found"))
                     .build();
         }
+        
+        List<LinkRef> links = new ArrayList<>();
+        links.add(link(uriInfo, "users/" + user.getUsername(), "self"));
+        links.add(link(uriInfo, "profiles/" + user.getUsername() + "/documents", "documents"));
+        user.setLinks(links);
 
         // If ADMIN -> allow any profile
         if (securityContext.isUserInRole("ADMIN")) {

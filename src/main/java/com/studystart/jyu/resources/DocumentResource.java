@@ -8,7 +8,12 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.studystart.jyu.resources.LinkBuilder.link;
 
 /**
  * Document endpoints scoped under a profile:
@@ -24,30 +29,37 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class DocumentResource {
 
-    private final DocumentService documentService = new DocumentService();
+	@Context UriInfo uriInfo;
+	
+	private final DocumentService documentService = new DocumentService();
 
     /** Public list (guest/user/admin) */
     @GET
     @PermitAll
-    public List<Document> getDocuments(@PathParam("username") String username,
+    public Response getDocuments(@PathParam("username") String username,
                                        @Context UriInfo uriInfo) {
         List<Document> documents = documentService.getAllDocuments(username);
-        for (Document d : documents) {
-            addLinks(d, username, uriInfo);
-        }
-        return documents;
+        for (Document d : documents) addItemLinks(d, username);
+        
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("items", documents);
+        body.put("links", List.of(
+                link(uriInfo, "profiles/" + username + "/documents", "self"),
+                link(uriInfo, "profiles/" + username, "profile")
+        ));
+        return Response.ok(body).build();
     }
 
     /** Public get (guest/user/admin). If you want it private, change to @RolesAllowed({"USER","ADMIN"}). */
     @GET
     @Path("/{documentId}")
     @RolesAllowed({"USER","ADMIN"})
-    public Document getDocument(@PathParam("username") String username,
+    public Response getDocument(@PathParam("username") String username,
                                 @PathParam("documentId") long documentId,
                                 @Context UriInfo uriInfo) {
         Document document = documentService.getDocument(username, documentId);
-        addLinks(document, username, uriInfo);
-        return document;
+        addItemLinks(document, username);
+        return Response.ok(document).build();
     }
 
     /** Create: USER or ADMIN. USER can only create for self (owner = current user). */
@@ -73,19 +85,18 @@ public class DocumentResource {
         }
 
         Document newDocument = documentService.addDocument(username, document);
-        addLinks(newDocument, username, uriInfo);
+        addItemLinks(newDocument, username);
 
-        URI uri = uriInfo.getAbsolutePathBuilder()
-                .path(String.valueOf(newDocument.getId()))
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(String.valueOf(newDocument.getId())).build())
+                .entity(newDocument)
                 .build();
-        return Response.created(uri).entity(newDocument).build();
     }
 
     /** Update: USER (own doc) or ADMIN (any doc). */
     @PUT
     @Path("/{documentId}")
     @RolesAllowed({"USER","ADMIN"})
-    public Document updateDocument(@PathParam("username") String username,
+    public Response updateDocument(@PathParam("username") String username,
                                    @PathParam("documentId") long documentId,
                                    Document document,
                                    @Context UriInfo uriInfo,
@@ -99,8 +110,8 @@ public class DocumentResource {
         // Keep ID consistent and update
         document.setId(documentId);
         Document updated = documentService.updateDocument(username, document);
-        addLinks(updated, username, uriInfo);
-        return updated;
+        addItemLinks(updated, username);
+        return Response.ok(updated).build();
     }
 
     /** Delete: ADMIN only. */
@@ -115,24 +126,11 @@ public class DocumentResource {
 
     // --- HATEOAS links (simple, string-based) ---
 
-    private void addLinks(Document document, String username, UriInfo uriInfo) {
-        // Self: /profiles/{username}/documents/{id}
-        String selfUri = uriInfo.getBaseUriBuilder()
-                .path("profiles")
-                .path(username)
-                .path("documents")
-                .path(Long.toString(document.getId()))
-                .build()
-                .toString();
-        document.addLink(selfUri, "self");
-
-        // Profile: /profiles/{username}
-        String profileUri = uriInfo.getBaseUriBuilder()
-                .path("profiles")
-                .path(username)
-                .build()
-                .toString();
-        document.addLink(profileUri, "profile");
+    private void addItemLinks(Document d, String username) {
+        d.setLinks(new ArrayList<>());
+        d.addLink(link(uriInfo, "profiles/" + username + "/documents/" + d.getId(), "self").getHref(), "self");
+        d.addLink(link(uriInfo, "profiles/" + username, "profile").getHref(), "profile");
+        // add more if needed, e.g. download/update/delete rels
     }
 
     // --- helpers ---

@@ -2,6 +2,7 @@ package com.studystart.jyu.models;
 
 import com.studystart.jyu.security.Role;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ public class UserResponse {
     private String lastName;
     private List<String> roles;
     private long createdAt;
+    private List<LinkRef> links = new ArrayList<>();
 
     // Default constructor
     public UserResponse() {
@@ -36,6 +38,9 @@ public class UserResponse {
     }
 
     // Getters and Setters
+    
+    public List<LinkRef> getLinks() { return links; }
+    public void setLinks(List<LinkRef> links) { this.links = links; }
 
     public String getUsername() {
         return username;
