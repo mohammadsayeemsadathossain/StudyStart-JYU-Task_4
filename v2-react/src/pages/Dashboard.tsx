@@ -21,10 +21,14 @@ export default function HomePage() {
 
   const navigate = useNavigate();
 
+  const API_BASE = process.env.REACT_APP_API_BASE
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     const storedUser = localStorage.getItem("user");
     const username = storedUser ? JSON.parse(storedUser).username : null;
+    //console.log("API_BASE:", API_BASE);
+
 
     if (!token || !username) {
       setUser(null);
@@ -32,7 +36,7 @@ export default function HomePage() {
       return;
     }
 
-    fetch(`http://localhost:8080/studystart/api/users/${username}`, {
+    fetch(`${API_BASE}/users/${username}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

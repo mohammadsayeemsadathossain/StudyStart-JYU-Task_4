@@ -21,6 +21,8 @@ export default function ProfilesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE = process.env.REACT_APP_API_BASE
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem("jwtToken");
@@ -29,7 +31,7 @@ export default function ProfilesPage() {
   const isGuest = !token || !username;
 
   useEffect(() => {
-    fetch(`http://localhost:8080/studystart/api/users`, {
+    fetch(`${API_BASE}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +84,7 @@ export default function ProfilesPage() {
   const handleDelete = async (usernameToDelete: string) => {
     if (!window.confirm(`Delete profile '${usernameToDelete}'?`)) return;
     try {
-      const res = await fetch(`http://localhost:8080/studystart/api/users/${usernameToDelete}`, {
+      const res = await fetch(`${API_BASE}/api/users/${usernameToDelete}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -98,10 +100,6 @@ export default function ProfilesPage() {
     } catch (err) {
       alert("Error deleting user: " + err);
     }
-  };
-
-  const handleEdit = (user: UserResponse) => {
-    alert(`Editing profile: ${user.username}\n(you can implement an edit form here)`);
   };
 
   if (loading) return <p>Loading profiles...</p>;
@@ -153,7 +151,6 @@ export default function ProfilesPage() {
             {/* Only show actions to admins */}
             {isAdmin() && (
               <div className="profile-actions">
-                <button onClick={() => handleEdit(user)} className="profile-btn edit">Edit</button>
                 <button onClick={() => handleDelete(user.username)} className="profile-btn delete">Delete</button>
               </div>
             )}

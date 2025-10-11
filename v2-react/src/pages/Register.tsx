@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import "../styles/Register.css";
 
+
 export default function RegisterPage() {
+  const API_BASE = process.env.REACT_APP_API_BASE
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -25,7 +28,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/studystart/api/users/register", {
+      const response = await fetch(`${API_BASE}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

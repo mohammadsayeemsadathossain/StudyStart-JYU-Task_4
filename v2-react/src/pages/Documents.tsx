@@ -23,7 +23,7 @@ interface Document {
   uploadDate: string;
 }
 
-const API_BASE = "http://localhost:8080/studystart/api";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const DocumentsPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);

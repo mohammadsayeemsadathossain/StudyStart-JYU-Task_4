@@ -13,6 +13,9 @@ export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE = process.env.REACT_APP_API_BASE;
+  console.log("API_BASE:", API_BASE);
+  
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +29,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/studystart/api/auth/login", {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -61,6 +64,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+
   };
 
   return (
