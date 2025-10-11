@@ -540,7 +540,71 @@
 					]
 				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "17: GET All Users WITH Admin, admin delete url is unavailable in links",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/studystart/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"studystart",
+								"api",
+								"users"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "http://localhost:3000"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, Content-Type, Accept, Authorization"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1524"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 11 Oct 2025 13:38:12 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"createdAt\": 1760189882431,\n        \"email\": \"sayeemhossain@gmail.com\",\n        \"firstName\": \"Mohammad Sayeem Sadat\",\n        \"lastName\": \"Hossain\",\n        \"links\": [\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/mohammad_sayeem_sadat_hossain\",\n                \"rel\": \"self\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/profiles/mohammad_sayeem_sadat_hossain/documents\",\n                \"rel\": \"documents\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/mohammad_sayeem_sadat_hossain\",\n                \"rel\": \"update\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/mohammad_sayeem_sadat_hossain\",\n                \"rel\": \"delete\"\n            }\n        ],\n        \"roles\": [\n            \"USER\"\n        ],\n        \"username\": \"mohammad_sayeem_sadat_hossain\"\n    },\n    {\n        \"createdAt\": 1760189872996,\n        \"email\": \"admin@studystart.jyu.fi\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"links\": [\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/admin\",\n                \"rel\": \"self\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/profiles/admin/documents\",\n                \"rel\": \"documents\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/admin\",\n                \"rel\": \"update\"\n            }\n        ],\n        \"roles\": [\n            \"ADMIN\",\n            \"USER\"\n        ],\n        \"username\": \"admin\"\n    },\n    {\n        \"createdAt\": 1760189886712,\n        \"email\": \"rkb07@gmail.com\",\n        \"firstName\": \"Rakibul Hasan\",\n        \"lastName\": \"Remon\",\n        \"links\": [\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/rakibul_hasan_remon\",\n                \"rel\": \"self\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/profiles/rakibul_hasan_remon/documents\",\n                \"rel\": \"documents\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/rakibul_hasan_remon\",\n                \"rel\": \"update\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/users/rakibul_hasan_remon\",\n                \"rel\": \"delete\"\n            }\n        ],\n        \"roles\": [\n            \"USER\"\n        ],\n        \"username\": \"rakibul_hasan_remon\"\n    }\n]"
+				}
+			]
 		},
 		{
 			"name": "18: GET All Users WITH Invalid Password",
@@ -1050,7 +1114,7 @@
 					},
 					"status": "Created",
 					"code": 201,
-					"_postman_previewlanguage": "",
+					"_postman_previewlanguage": null,
 					"header": [
 						{
 							"key": "Location",
@@ -1155,7 +1219,7 @@
 					},
 					"status": "OK",
 					"code": 200,
-					"_postman_previewlanguage": "",
+					"_postman_previewlanguage": null,
 					"header": [
 						{
 							"key": "Access-Control-Allow-Origin",

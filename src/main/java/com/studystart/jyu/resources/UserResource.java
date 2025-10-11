@@ -93,6 +93,36 @@ public class UserResource {
     @PermitAll
     public Response getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
+        
+        boolean isAdmin = sc != null && sc.isUserInRole("ADMIN");
+
+        if (isAdmin) {
+            for (UserResponse u : users) {
+                String selfHref = uriInfo.getBaseUriBuilder()
+                        .path("users").path(u.getUsername())
+                        .build()
+                        .toString();
+
+                String docsHref = uriInfo.getBaseUriBuilder()
+                        .path("profiles").path(u.getUsername()).path("documents")
+                        .build()
+                        .toString();
+
+                List<LinkRef> links = new ArrayList<>();
+                links.add(new LinkRef(selfHref, "self"));
+                links.add(new LinkRef(docsHref, "documents"));
+                links.add(new LinkRef(selfHref, "update"));
+
+                boolean targetIsAdmin = u.getRoles() != null && u.getRoles().stream()
+                        .anyMatch(r -> "ADMIN".equalsIgnoreCase(r));
+                
+                if (isAdmin && !targetIsAdmin) {
+                    links.add(new LinkRef(selfHref, "delete"));
+                }
+
+                u.setLinks(links);
+            }
+        }
         return Response.ok(users).build();
     }
 
