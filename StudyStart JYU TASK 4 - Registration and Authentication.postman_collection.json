@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "b1a53a5a-27b1-443c-a147-394bea14e973",
+		"_postman_id": "0ebf86ac-a74b-478c-9b52-e53b8f198f78",
 		"name": "StudyStart JYU TASK 4 - Registration and Authentication",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "48849907",
-		"_collection_link": "https://nnahid878-8212314.postman.co/workspace/Mushfiqul-lslam-Chowdhury's-Wor~a0fe1e29-f74a-4b14-82c2-a04bd28fcb7f/collection/48849907-b1a53a5a-27b1-443c-a147-394bea14e973?action=share&source=collection_link&creator=48849907"
+		"_collection_link": "https://nnahid878-8212314.postman.co/workspace/Mushfiqul-lslam-Chowdhury's-Wor~a0fe1e29-f74a-4b14-82c2-a04bd28fcb7f/collection/48849907-0ebf86ac-a74b-478c-9b52-e53b8f198f78?action=share&source=collection_link&creator=48849907"
 	},
 	"item": [
 		{
@@ -838,7 +838,7 @@
 					},
 					"status": "OK",
 					"code": 200,
-					"_postman_previewlanguage": "",
+					"_postman_previewlanguage": "Text",
 					"header": [
 						{
 							"key": "Content-Type",
@@ -951,7 +951,7 @@
 					},
 					"status": "OK",
 					"code": 200,
-					"_postman_previewlanguage": null,
+					"_postman_previewlanguage": "Text",
 					"header": [
 						{
 							"key": "Content-Type",
@@ -976,6 +976,226 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"createdAt\": 1759744715356,\n    \"email\": \"mushfiqulislamchowdhury@gmail.com\",\n    \"firstName\": \"Mushfiqul Islam\",\n    \"lastName\": \"Chowdhury\",\n    \"roles\": [\n        \"USER\"\n    ],\n    \"username\": \"mushfiqulislam\"\n}"
+				}
+			]
+		},
+		{
+			"name": "27: Upload Documents",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdHVkeXN0YXJ0LWp5dSIsInN1YiI6Im11c2hmaXF1bGlzbGFtIiwiaWF0IjoxNzYwMTg2MTU2LCJleHAiOjE3NjAxODk3NTYsInJvbGVzIjpbIlVTRVIiXX0.YMYm_A8yPUZ5dZGWXZbsPKgbClUiFBkeHkul14uiurk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/C:/Users/ASUS/Downloads/081-MushfiqulIslam.jpg"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/new/PASSPORT",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"profiles",
+						"mushfiqulislam",
+						"documents",
+						"new",
+						"PASSPORT"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/new/PASSPORT",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/C:/Users/ASUS/Downloads/081-MushfiqulIslam.jpg"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/new/PASSPORT",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"studystart",
+								"api",
+								"profiles",
+								"mushfiqulislam",
+								"documents",
+								"new",
+								"PASSPORT"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Location",
+							"value": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "http://localhost:3000"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, Content-Type, Accept, Authorization"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "613"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 11 Oct 2025 12:39:16 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"document\": {\n        \"contentType\": \"image/jpeg\",\n        \"documentType\": \"PASSPORT\",\n        \"fileName\": \"1760186356599_PASSPORT.jpg\",\n        \"id\": 3,\n        \"links\": [\n            {\n                \"href\": \"http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3\",\n                \"rel\": \"self\"\n            },\n            {\n                \"href\": \"http://localhost:8080/studystart/api/profiles/mushfiqulislam\",\n                \"rel\": \"profile\"\n            }\n        ],\n        \"ownerUsername\": \"mushfiqulislam\",\n        \"sizeBytes\": 1022250,\n        \"status\": \"UPLOADED\",\n        \"storagePath\": \"E:\\\\Semester 1\\\\TIES4560 SOA and Cloud Computing\\\\.metadata\\\\.plugins\\\\org.eclipse.wst.server.core\\\\tmp1\\\\uploads\\\\1760186356599_PASSPORT.jpg\",\n        \"uploadDate\": \"2025-10-11T12:39:16.608Z[UTC]\",\n        \"username\": \"mushfiqulislam\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "28: Get Specific Document",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdHVkeXN0YXJ0LWp5dSIsInN1YiI6Im11c2hmaXF1bGlzbGFtIiwiaWF0IjoxNzYwMTg2MTU2LCJleHAiOjE3NjAxODk3NTYsInJvbGVzIjpbIlVTRVIiXX0.YMYm_A8yPUZ5dZGWXZbsPKgbClUiFBkeHkul14uiurk",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"studystart",
+						"api",
+						"profiles",
+						"mushfiqulislam",
+						"documents",
+						"3"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"studystart",
+								"api",
+								"profiles",
+								"mushfiqulislam",
+								"documents",
+								"3"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "http://localhost:3000"
+						},
+						{
+							"key": "Access-Control-Allow-Headers",
+							"value": "Origin, Content-Type, Accept, Authorization"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Access-Control-Allow-Methods",
+							"value": "GET, POST, PUT, DELETE, OPTIONS, HEAD"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "600"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 11 Oct 2025 12:40:58 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"contentType\": \"image/jpeg\",\n    \"documentType\": \"PASSPORT\",\n    \"fileName\": \"1760186356599_PASSPORT.jpg\",\n    \"id\": 3,\n    \"links\": [\n        {\n            \"href\": \"http://localhost:8080/studystart/api/profiles/mushfiqulislam/documents/3\",\n            \"rel\": \"self\"\n        },\n        {\n            \"href\": \"http://localhost:8080/studystart/api/profiles/mushfiqulislam\",\n            \"rel\": \"profile\"\n        }\n    ],\n    \"ownerUsername\": \"mushfiqulislam\",\n    \"sizeBytes\": 1022250,\n    \"status\": \"UPLOADED\",\n    \"storagePath\": \"E:\\\\Semester 1\\\\TIES4560 SOA and Cloud Computing\\\\.metadata\\\\.plugins\\\\org.eclipse.wst.server.core\\\\tmp1\\\\uploads\\\\1760186356599_PASSPORT.jpg\",\n    \"uploadDate\": \"2025-10-11T12:39:16.608Z[UTC]\",\n    \"username\": \"mushfiqulislam\"\n}"
 				}
 			]
 		}
