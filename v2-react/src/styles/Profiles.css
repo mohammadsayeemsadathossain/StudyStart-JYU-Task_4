@@ -1,0 +1,142 @@
+.profiles-container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 0 20px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+.profiles-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #222;
+}
+
+.profiles-search-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.profiles-search-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.profiles-search-bar input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.profiles-search-bar button {
+  margin-left: 12px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.profiles-search-bar button:hover {
+  background-color: #333;
+}
+
+.profiles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info p {
+  margin: 3px 0;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.profile-username {
+  color: #555;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: #777;
+}
+
+.profile-roles {
+  font-size: 13px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.profile-btn.edit {
+  background-color: #f5a623;
+}
+
+.profile-btn.edit:hover {
+  background-color: #d88e15;
+}
+
+.profile-btn.delete {
+  background-color: #e63946;
+}
+
+.profile-btn.delete:hover {
+  background-color: #c32f3b;
+}
+
+.no-profiles {
+  text-align: center;
+  color: #666;
+  margin-top: 20px;
+  font-size: 16px;
+}
