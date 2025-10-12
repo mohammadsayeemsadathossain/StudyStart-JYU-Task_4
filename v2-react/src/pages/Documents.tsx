@@ -69,6 +69,8 @@ const DocumentsPage: React.FC = () => {
         setDocuments(data);
       } else if (Array.isArray(data.documents)) {
         setDocuments(data.documents);
+      } else if (Array.isArray(data.items)) {
+        setDocuments(data.items);
       } else {
         console.warn("Unexpected data format:", data);
         setDocuments([]);
